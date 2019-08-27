@@ -1,6 +1,6 @@
 // src/usingDB/controllers/Helper.js
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const Helper = {
   /**
@@ -43,4 +43,4 @@ const Helper = {
   }
 }
 
-export default Helper;
+module.exports = Helper;

@@ -44,4 +44,34 @@ router.post('/add', async (req, res, next) =>{
     })
 });
 
+router.delete('/remove/:id', async (req, res, next)=>{
+    try{
+     let {id} = req.param
+     rslt  =await Staff.destroy({
+         where:{id}
+     })
+     !!rslt ? res.json({
+         meta:{
+             status:'Ok',
+             message:' Staff removed ',
+         },
+         data:{},
+     })
+     :res.json({
+         meta:{
+             message:'Couldnt remove Staff',
+             status:'Failed',
+         },
+         data:{},
+     })
+    }catch(error){
+     res.json({
+         meta:{
+             message:`Couldnt remove Staff ${error}`,
+             status:'Failed ',
+         },
+         data:{},
+     })
+    }
+ });
 module.exports = router;

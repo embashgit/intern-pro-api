@@ -8,8 +8,6 @@ router.post('/', async (req, res, next)=> {
         let newSupvrs = await Supvsr.create({
             roleid,
             staffid,
-            createdAt: new Date(),
-            updatedAt: new Date()
         },{
         });
         if(newSupvrs){

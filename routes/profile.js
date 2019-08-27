@@ -7,7 +7,7 @@ const saltRounds = 10;
 const router = express.Router();
 const Profile = require('../models/profile');
 const staff = require('../models/staff');
-
+const helper = require('../controller/helper')
 
 
 
@@ -15,10 +15,11 @@ const staff = require('../models/staff');
 router.post('/signup', async (req, res, next) => {
     let { username, password, staffid } = req.body;
     try {
-        let pHash = bcrypt.hashSync(password, saltRounds)
+        // let pHash = bcrypt.hashSync(password, saltRounds)
+        
         let newProfile = await Profile.create({
             username,
-            password: pHash,
+            password: helper.hashPassword(password),
             staffid
         }, {
                 fields: ["username", "password", "staffid"]
@@ -56,14 +57,15 @@ router.post('/signup', async (req, res, next) => {
 
 // GET data
 router.get('/profile/:id',async(req,res,next)=>{
-    let { id } = req.paams;
+    let { id } = req.params;
     try{
-        let profile =await staff.findOne({
+        let user =await staff.findOne({
             where:{
                 id:id
             }
         })
-     if(!profile){
+        
+     if(!user){
         res.json({
             meta: {
                 status: 'failed',
@@ -72,13 +74,30 @@ router.get('/profile/:id',async(req,res,next)=>{
             data: {},
         })
      }else{
-        res.json({
-            meta: {
-            status: 'Ok',
-            message: `Success`,
-            },
-            data:profile,
-         })         
+         let staff =  Profile.findOne({
+            where:{
+                staffid:id
+            }
+        });
+        staff.then(rsp=>{
+            if(rsp){
+                res.json({
+                    meta: {
+                    status: 'Ok',
+                    message: `Success`,
+                    },
+                    data:{"profile":rsp.get(),"staff":user},
+                 })         
+            }else{
+                res.json({
+                    meta: {
+                    status: 'Ok',
+                    message: `Success`,
+                    },
+                    data:{"profile":{},"staff":user},
+                 })   
+            }
+        })
      }
     }catch (error) {
         res.json({
@@ -111,7 +130,11 @@ router.post('/signin', async (req, res,next) => {
                 data: {},
             })
         }else{
-         let checkPwd =  bcrypt.compareSync(password,userprofile.password)
+  
+    let checkPwd  = helper.comparePassword(userprofile.password,password);
+    // let token = helper.generateToken(userprofile.staffid);
+        //  let checkPwd =  bcrypt.compareSync(password,userprofile.password)
+        
          if(checkPwd){
              
             
@@ -146,7 +169,7 @@ router.post('/signin', async (req, res,next) => {
         res.json({
             meta: {
                 status: 'failed',
-                message: `Network failed  ${error}`,
+                message: `Authentication failed failed  ${error}`,
             },
             data: {},
         })
