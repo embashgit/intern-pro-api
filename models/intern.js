@@ -5,6 +5,7 @@ const Sequelize = db.Sequelize;
   const Intern = sequelize.define('intern', {
     status: Sequelize.STRING,
     remark:Sequelize.STRING,
+    supervisorid:Sequelize.INTEGER,
     level:Sequelize.STRING,
     institution:Sequelize.STRING,
     roleid:Sequelize.INTEGER,

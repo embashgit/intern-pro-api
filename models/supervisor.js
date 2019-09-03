@@ -4,7 +4,7 @@ const Sequelize = db.Sequelize;
   const Supervisor = sequelize.define('supervisor', {
     staffid: Sequelize.INTEGER,
     roleid: Sequelize.INTEGER,
-
+    
   }, {
     timestamps:true,
   });

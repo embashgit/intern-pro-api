@@ -8,6 +8,7 @@ router.post('/add', async (req, res, next)=> {
     let {status,
         institution,
         duedate,
+        supervisorid,
         level,
         roleid,
         staffid,
@@ -20,12 +21,13 @@ router.post('/add', async (req, res, next)=> {
             const newIntern = await Intern.create({
                 status,
                 institution,
+                supervisorid,
                 duedate,
                 level,
                 staffid,
                 roleid
             },{
-                fields:["staffid","roleid","level","institution","duedate","status",]
+                fields:["staffid","roleid","level","institution","supervisorid","duedate","status",]
             });
         
         if(newIntern){
@@ -61,10 +63,7 @@ router.post('/add', async (req, res, next)=> {
     })
 });
 
-
-
 /****** Get all interns ******/
-
 router.get('/fetch', async (req, res, next)=> {
     let  internData = [];
     try{
@@ -114,13 +113,12 @@ router.get('/fetch', async (req, res, next)=> {
 
 });
 
- /****** Get all interns Tasks ******/
- 
+ /****** Get all intern's Tasks ******/
  router.get('/tasks', async (req,res,nex)=>{
      let {id} = req.body
     try {
        alltask = await Task.findAll({where:{staffid:id}});
-       
+
        !!alltask.length?res.json({
         meta:{
             message:'Success',
@@ -144,9 +142,10 @@ router.get('/fetch', async (req, res, next)=> {
             data:{},
         })
     }
-})
-/**** delete intern  *****/
+});
 
+
+/**** delete intern  *****/
 router.delete('/remove/:id', async (req, res, next)=>{
    try{
     let {id} = req.param

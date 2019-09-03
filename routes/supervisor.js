@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Supvsr = require('../models/supervisor');
 /* GET users listing. */
-router.post('/', async (req, res, next)=> {
+router.post('/add', async (req, res, next)=> {
     let {roleid,staffid} = req.body;
     try {
         let newSupvrs = await Supvsr.create({
@@ -40,5 +40,36 @@ router.post('/', async (req, res, next)=> {
         data:'request sent!',
     })
 });
+/***   ***/ 
 
+router.delete('/delete/:id', async (req, res, next)=>{
+    try{
+     let {id} = req.param
+     rslt  =await Supvsr.destroy({
+         where:{staffid:id}
+     })
+     !!rslt ? res.json({
+         meta:{
+             status:'Ok',
+             message:'Supervisor deleted ',
+         },
+         data:{},
+     })
+     :res.json({
+         meta:{
+             message:'Couldnt delete Supervisor',
+             status:'Failed',
+         },
+         data:{},
+     })
+    }catch(error){
+     res.json({
+         meta:{
+             message:`Couldnt delete Supervisor ${error}`,
+             status:'Failed ',
+         },
+         data:{},
+     })
+    }
+ });
 module.exports = router;

@@ -3,6 +3,7 @@ const sequelize = db.sequelize;
 const Sequelize = db.Sequelize;
   const Task = sequelize.define('task', {
     staffid: Sequelize.INTEGER,
+    supervisorid: Sequelize.INTEGER,
     status: Sequelize.STRING,
     description:Sequelize.STRING,
     duedate:Sequelize.STRING,
