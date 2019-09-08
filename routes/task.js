@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const Task = require('../models/task');
+const Staff = require('../models/staff');
 /* GET users listing. */
 router.post('/add', async (req, res, next)=> {
-    let {title,description,duedate,status,staffid} = req.body;
+    let {title,description,duedate,status,staffid,supervisorid} = req.body;
     try {
-        // const checkrow = Task.findOne({where:{staffid:staffid,title:title,description:description}})
-        // if(!checkrow){
             let newtask = await Task.create({
                 title,
                 description,
                 duedate,
+                supervisorid,
                 status,
                 staffid,
             },{
-                fields: ["title", "description", "duedate","status","staffid"] 
+                fields: ["title", "description", "duedate","status","staffid","supervisorid"] 
             });
             if(newtask){
                 res.json({
@@ -33,16 +33,6 @@ router.post('/add', async (req, res, next)=> {
                     data:{},
                 })
             }
-        // }else{
-        //     res.json({
-        //         meta:{
-        //             status:'failed',
-        //         message:'unsuccessful Task already Assigned to user'
-        //     },
-        //         data:{},
-        //     })
-        // }
-        
     } catch (error) {
         res.json({
             meta:{
@@ -99,42 +89,68 @@ router.put('/progress/update',async (req,res, next)=>{
 
 
 
+
  /**** View all task assigned ****/
 
-router.get('/fetch', async (req,res,nex)=>{
+router.get('/fetch', async (req,res,next)=>{
+
     try {
-       alltask = await Task.findAll()
-       !!alltask.length?res.json({
-        meta:{
-            message:'Success',
-            status:'Ok',
-        },
-        data:alltask,
-    })
-    :res.json({
-        meta:{
-            message:'No Tasks',
-            status:'Failed',
-        },
-        data:{},
-    })
-    } catch (error) {
-        es.json({
+     const  alltask = await Task.findAll();
+     let container =[];
+     if(alltask){
+        for(s of alltask){
+            const user = await Staff.findOne({
+                where:{
+                    id:s.supervisorid
+                }
+            })
+            if(user){
+                container.push({
+                    'supervisor':`${user.firstname} ${user.surname}`,
+                    'data':s
+                })
+            }else{
+                container.push({
+                    'supervisor':`null`,
+                    'data':s
+                })
+            }
+        
+        }
+
+         res.json({
             meta:{
-                message:`Couldnt Task ${error}`,
+                message:'Success',
+                status:'Ok',
+            },
+            data:container,
+        })
+     } else{
+         res.json({
+             meta:{
+                 message:'No Tasks',
+                 status:'Failed',
+             },
+             data:{},
+         })
+     }
+    } catch (error) {
+        res.json({
+            meta:{
+                message:`Couldnt find Task ${error}`,
                 status:'Failed',
             },
             data:{},
         })
     }
-})
+});
  /**
   * Delete a task
   */
 router.delete('/delete/:id', async (req, res, next)=>{
     try{
-     let {id} = req.param
-     rslt  =await Task.destroy({
+     let {id} = req.params;
+    const rslt  =await Task.destroy({
          where:{id}
      })
      !!rslt ? res.json({

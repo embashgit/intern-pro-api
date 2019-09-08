@@ -23,6 +23,10 @@ module.exports = {
         type:Sequelize.DATE,
         // defaultValue:d.setMonth(d.getMonth() + 6),
     },
+    supervisorid:{
+      type:Sequelize.INTEGER,
+      allowNull:true,
+    },
     level:{
         type:Sequelize.STRING,
         allowNull:true,

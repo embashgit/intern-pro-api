@@ -11,6 +11,38 @@ const helper = require('../controller/helper')
 
 
 
+/****** ALL PROFILE *****/ 
+router.get('/profiles', async (req, res,next)=>{
+    try {
+        const allprofile = await Profile.findAll();
+        if(allprofile){
+            res.json({
+                meta: {
+                    status: "Ok",
+                    message: 'Success',
+                },
+                data: allprofile,
+            })
+        }
+        if(!allprofile.length){
+            res.json({
+                meta: {
+                    status: "Ok",
+                    message: 'Success',
+                },
+                data: 'No record found',
+            })
+        }
+    } catch (error) {
+        res.json({
+            meta: {
+                status: 'failed',
+                message: 'not successful',
+            },
+            data: `failed ${error}`
+        })
+    }
+})
 /* POST  users . */
 router.post('/signup', async (req, res, next) => {
     let { username, password, staffid } = req.body;
@@ -111,7 +143,7 @@ router.get('/profile/:id',async(req,res,next)=>{
 })
 /**
  * Login API
- */
+*/
 router.post('/signin', async (req, res,next) => {
     let userprofile,data =[];
     let { username, password } = req.body;

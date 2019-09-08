@@ -66,73 +66,87 @@ router.post('/add', async (req, res, next)=> {
 /****** Get all interns ******/
 router.get('/fetch', async (req, res, next)=> {
     let  internData = [];
-    try{
-        
-        const Interns = await staff.findAll({ where:{
-            roleid:3
-        }});
-    if(Interns){
-        for(ntern of Interns){
-            const user = await Intern.findOne({
-                where:{
-                    staffid:ntern.id
-                }
-            })
-
-                internData.push({
-                    'intern':user,
-                    'data':ntern
+        try{
+            
+            const Interns = await staff.findAll({ where:{
+                roleid:3
+            }});
+        if(Interns){
+            for(ntern of Interns){
+                const user = await Intern.findOne({
+                    where:{
+                        staffid:ntern.id
+                    }
                 })
-        
+    
+                    internData.push({
+                        'intern':user,
+                        'data':ntern
+                    })
+            
+            }
+            res.json({
+               meta:{
+                   status:'OK',
+                   message:'Success',
+               },
+               data:internData,
+           })
+        }else{
+            res.json({
+                meta:{
+                    status:'Failed',
+                    message:'Fail to fetch user please try again',
+                },
+                data:{},
+            })
         }
-        res.json({
-           meta:{
-               status:'OK',
-               message:'Success',
-           },
-           data:internData,
-       })
-    }else{
-        res.json({
+        }catch(error){
+            res.json({
+                meta:{
+                    status:'Failed',
+                    message:`Fail to fetch user ${error}`,
+                },
+                data:{},
+            })
+        }
+    
+    });
+   
+     /****** Get all intern's Tasks ******/
+     router.get('/tasks', async (req,res,nex)=>{
+         let {id} = req.body, availableTask=[];
+         
+        try {
+      const alltask = await Task.findAll({where:{staffid:id}});
+
+       if(alltask.length){
+           for(task of alltask){
+            const supervisor = await staff.findByPk(task.supervisorid)
+            let supervisorname = `${supervisor.firstname} ${supervisor.surname}`;
+            let supervisormail = supervisor.email;
+            availableTask.push({
+                ta
+            })
+           }
+           res.json({
             meta:{
-                status:'Failed',
-                message:'Fail to fetch user please try again',
+                message:'Success',
+                status:'Ok',
             },
-            data:{},
+            data:alltask,
+           
         })
-    }
-    }catch(error){
-        res.json({
-            meta:{
-                status:'Failed',
-                message:`Fail to fetch user ${error}`,
-            },
-            data:{},
-        })
-    }
-
-});
-
- /****** Get all intern's Tasks ******/
- router.get('/tasks', async (req,res,nex)=>{
-     let {id} = req.body
-    try {
-       alltask = await Task.findAll({where:{staffid:id}});
-
-       !!alltask.length?res.json({
-        meta:{
-            message:'Success',
-            status:'Ok',
-        },
-        data:alltask,
-    })
-    :res.json({
-        meta:{
-            message:'No Task Assigned Yet',
-            status:'Failed',
-        },
-        data:{},
-    })
+       }
+       else{
+           res.json({
+               meta:{
+                   message:'No Task Assigned Yet',
+                   status:'Failed',
+               },
+               data:{},
+           })
+       }
     } catch (error) {
         es.json({
             meta:{
@@ -148,7 +162,7 @@ router.get('/fetch', async (req, res, next)=> {
 /**** delete intern  *****/
 router.delete('/remove/:id', async (req, res, next)=>{
    try{
-    let {id} = req.param
+    let {id} = req.params
     rslt  =await Intern.destroy({
         where:{id}
     })

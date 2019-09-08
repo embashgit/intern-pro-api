@@ -40,6 +40,39 @@ router.post('/add', async (req, res, next)=> {
         data:'request sent!',
     })
 });
+
+ /*****fetch tasks******/
+ router.get('/task/:id', async (req,res,nex)=>{
+     let {id} = req.params;
+    try {
+     const  alltask = await Task.findAll({where:{supervisorid:id}})
+     if(alltask){
+         res.json({
+            meta:{
+                message:'Success',
+                status:'Ok',
+            },
+            data:alltask,
+        })
+     } else{
+         res.json({
+             meta:{
+                 message:'No Tasks',
+                 status:'Failed',
+             },
+             data:{},
+         })
+     }
+    } catch (error) {
+        res.json({
+            meta:{
+                message:`Couldnt find Task ${error}`,
+                status:'Failed',
+            },
+            data:{},
+        })
+    }
+})
 /***   ***/ 
 
 router.delete('/delete/:id', async (req, res, next)=>{
