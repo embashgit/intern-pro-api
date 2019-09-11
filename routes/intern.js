@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Intern = require('../models/intern');
 const staff = require('../models/staff');
-
+const Task = require('../models/task');
 /**** POST for adding Interns. ****/
 router.post('/add', async (req, res, next)=> {
     let {status,
@@ -114,43 +114,54 @@ router.get('/fetch', async (req, res, next)=> {
     });
    
      /****** Get all intern's Tasks ******/
-     router.get('/tasks', async (req,res,nex)=>{
-         let {id} = req.body, availableTask=[];
+     router.get('/tasks/:id', async (req,res,nex)=>{
+         let {id} = req.params;
          
         try {
       const alltask = await Task.findAll({where:{staffid:id}});
 
-       if(alltask.length){
-           for(task of alltask){
-            const supervisor = await staff.findByPk(task.supervisorid)
-            let supervisorname = `${supervisor.firstname} ${supervisor.surname}`;
-            let supervisormail = supervisor.email;
-            availableTask.push({
-                ta
-            })
-           }
-           res.json({
-            meta:{
-                message:'Success',
-                status:'Ok',
-            },
-            data:alltask,
-           
-        })
-       }
-       else{
-           res.json({
-               meta:{
-                   message:'No Task Assigned Yet',
-                   status:'Failed',
-               },
-               data:{},
-           })
-       }
+      let container =[];
+      if(alltask){
+         for(s of alltask){
+             const user = await staff.findOne({
+                 where:{
+                     id:s.supervisorid
+                 }
+             })
+             if(user){
+                 container.push({
+                     'supervisor':`${user.firstname} ${user.surname}`,
+                     'data':s
+                 })
+             }else{
+                 container.push({
+                     'supervisor':`null`,
+                     'data':s
+                 })
+             }
+         
+         }
+ 
+          res.json({
+             meta:{
+                 message:'Success',
+                 status:'Ok',
+             },
+             data:container,
+         })
+      } else{
+          res.json({
+              meta:{
+                  message:'No Tasks',
+                  status:'Failed',
+              },
+              data:{},
+          })
+      }
     } catch (error) {
-        es.json({
+        res.json({
             meta:{
-                message:`Couldnt delete Task ${error}`,
+                message:`Couldnt Fetch Task ${error}`,
                 status:'Failed',
             },
             data:{},
@@ -192,3 +203,34 @@ router.delete('/remove/:id', async (req, res, next)=>{
 });
 
 module.exports = router;
+
+
+
+
+// if(alltask.length){
+//     for(task of alltask){
+//      const supervisor = await staff.findByPk(task.supervisorid)
+//      let supervisorname = `${supervisor.firstname} ${supervisor.surname}`;
+//      let supervisormail = supervisor.email;
+//      availableTask.push({
+//          ta
+//      })
+//     }
+//     res.json({
+//      meta:{
+//          message:'Success',
+//          status:'Ok',
+//      },
+//      data:alltask,
+    
+//  })
+// }
+// else{
+//     res.json({
+//         meta:{
+//             message:'No Task Assigned Yet',
+//             status:'Failed',
+//         },
+//         data:{},
+//     })
+// }

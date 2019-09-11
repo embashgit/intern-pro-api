@@ -40,7 +40,20 @@ const Helper = {
       process.env.SECRET, { expiresIn: '7d' }
     );
     return token;
-  }
+  },
+
+  intern :[
+    { "module": "Dashboard", "pages": ["InternDashboard"]},
+    { "module": "Tasks", "pages": []},
+  ],
+supervisors:  [
+    { "module": "Dashboard", "pages": [] },
+    { "module": "Staff", "pages": ["Interns","Supervisor","Tasks"] },
+  ],
+  admin:[
+    { "module": "Dashboard", "pages": [] },
+    { "module": "Staff", "pages": ["Interns","Supervisor"] },
+  ]
 }
 
 module.exports = Helper;
